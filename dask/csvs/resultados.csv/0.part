@@ -1,0 +1,10 @@
+Activity Period,Operating Airline,Operating Airline IATA Code,Published Airline,Published Airline IATA Code,GEO Summary,GEO Region,Activity Type Code,Price Category Code,Terminal,Boarding Area,Passenger Count,Adjusted Activity Type Code,Adjusted Passenger Count,Year,Month
+201403,LAN Peru,LP,LAN Peru,LP,International,South America,Enplaned,Other,International,A,2886,Enplaned,2886,2014,March
+201603,Etihad Airways,EY,Etihad Airways,EY,International,Middle East,Enplaned,Other,International,A,5007,Enplaned,5007,2016,March
+201603,TACA,TA,TACA,TA,International,Central America,Enplaned,Other,International,A,5405,Enplaned,5405,2016,March
+201603,United Airlines,UA,United Airlines,UA,International,Asia,Enplaned,Other,International,G,71388,Enplaned,71388,2016,March
+201603,United Airlines,UA,United Airlines,UA,International,Australia / Oceania,Enplaned,Other,International,G,6372,Enplaned,6372,2016,March
+201603,United Airlines,UA,United Airlines,UA,International,Canada,Enplaned,Other,Terminal 3,F,9378,Enplaned,9378,2016,March
+201603,Virgin America,VX,Virgin America,VX,Domestic,US,Enplaned,Low Fare,Terminal 2,D,194636,Enplaned,194636,2016,March
+201603,Virgin America,VX,Virgin America,VX,International,Mexico,Enplaned,Low Fare,Terminal 2,D,4693,Enplaned,4693,2016,March
+201603,Virgin Atlantic,VS,Virgin Atlantic,VS,International,Europe,Enplaned,Other,International,A,10898,Enplaned,10898,2016,March
