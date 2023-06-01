@@ -3,179 +3,153 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 
+class DataAnalysis:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.df = None
 
-# Cargar el conjunto de datos en un dataframe de Dask
-df = dd.read_csv('C:/Trabajo-dask/dask/csvs/air_traffic_data (1).csv')
-df.info()
+    def load_data(self):
+        self.df = dd.read_csv(self.file_path)
+        self.df.info()
 
+    def print_data_types(self):
+        print(self.df.dtypes)
 
-print(df.dtypes)
-# ¿Cuántas compañías diferentes aparecen en el fichero?
-num_companias = df['Operating Airline'].nunique().compute()
-print(f"Número de compañías diferentes: {num_companias}")
+    def count_unique_companies(self):
+        num_companies = self.df['Operating Airline'].nunique().compute()
+        print(f"Número de compañías diferentes: {num_companies}")
 
-# ¿Cuántos pasajeros tienen de media los vuelos de cada compañía?
-pasajeros_media = df.groupby('Operating Airline')['Passenger Count'].mean().compute()
-print("Media de pasajeros por compañía:")
-print(pasajeros_media)
+    def average_passengers_per_company(self):
+        passengers_mean = self.df.groupby('Operating Airline')['Passenger Count'].mean().compute()
+        print("Media de pasajeros por compañía:")
+        print(passengers_mean)
 
-# Eliminar los registros duplicados por el campo "GEO Región",
-# manteniendo únicamente aquel con mayor número de pasajeros.
-df_sin_duplicados = df.drop_duplicates(subset='GEO Region', keep='last')
-df = df.drop_duplicates()
-# dime los valores vacios de cada columna
-print('------Valores vacios------')
-print(df.isnull().sum().compute())
-# borra los valores vacios
-df = df.dropna()
-# dime los valores vacios de cada columna
-print('------Valores vacios------')
-print(df.isnull().sum().compute())
+    def remove_duplicates(self):
+        df_without_duplicates = self.df.drop_duplicates(subset='GEO Region', keep='last')
+        self.df = self.df.drop_duplicates()
+        print('------Valores vacíos------')
+        print(self.df.isnull().sum().compute())
+        self.df = self.df.dropna()
+        print('------Valores vacíos------')
+        print(self.df.isnull().sum().compute())
+        df_without_duplicates.to_csv('C:/Trabajo-dask/dask/csvs/resultados.csv', index=False)
 
+    def remove_columns(self):
+        columns_to_remove = ['Published Airline', 'Published Airline IATA Code','Adjusted Passenger Count', 'Adjusted Activity Type Code']
+        self.df = self.df.drop(columns_to_remove, axis=1)
+        print(f"Número de columnas: {len(self.df.columns)}")
+        print(self.df.dtypes)
 
-# Volcar los resultados a un archivo CSV
-df_sin_duplicados.to_csv('C:/Trabajo-dask/dask/csvs/resultados.csv', index=False)
+    def analyze_geo_summary(self):
+        print('------GEO Summary------')
+        print(self.df['GEO Summary'].unique().compute())
+        print(self.df['GEO Summary'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['GEO Summary'].unique())}
+        self.df['GEO Summary'] = self.df['GEO Summary'].map(word_to_number)
 
-# Lista de columnas a eliminar ya que no son necesarias
-columnas_a_eliminar = ['Published Airline', 'Published Airline IATA Code', 'Adjusted Passenger Count','Adjusted Activity Type Code']
+    def analyze_geo_region(self):
+        print('------GEO Region------')
+        print(self.df['GEO Region'].unique().compute())
+        print(self.df['GEO Region'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['GEO Region'].unique())}
+        self.df['GEO Region'] = self.df['GEO Region'].map(word_to_number)
 
-# Eliminar las columnas especificadas
-df_sin_columnas = df.drop(columnas_a_eliminar, axis=1)
+    def analyze_activity_type_code(self):
+        print('------Activity Type Code------')
+        print(self.df['Activity Type Code'].unique().compute())
+        print(self.df['Activity Type Code'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['Activity Type Code'].unique())}
+        self.df['Activity Type Code'] = self.df['Activity Type Code'].map(word_to_number)
 
-# Mostrar el numero de columnas  del dataframe y el tipo de dato de cada una
-print(f"Número de columnas: {len(df_sin_columnas.columns)}")
-print(df_sin_columnas.dtypes)
-# GEO Summary
-print('------GEO Summary------')
-# dime los valores unicos de la columna Operating Airline y cuantas veces aparece cada uno
-print(df_sin_columnas['GEO Summary'].unique().compute())
-print(df_sin_columnas['GEO Summary'].value_counts().compute())
-# cambia los si y no por 1 y 0
-df_sin_columnas['GEO Summary'] = df_sin_columnas['GEO Summary'].replace({'International': 1, 'Domestic': 0})
+    def analyze_price_category_code(self):
+        print('------Price Category Code------')
+        print(self.df['Price Category Code'].unique().compute())
+        print(self.df['Price Category Code'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['Price Category Code'].unique())}
+        self.df['Price Category Code'] = self.df['Price Category Code'].map(word_to_number)
 
-print('------GEO Region------')
-# dime los valores unicos de la columna Operating Airline y cuantas veces aparece cada uno
-print(df_sin_columnas['GEO Region'].unique().compute())
-print(df_sin_columnas['GEO Region'].value_counts().compute())
-df_sin_columnas['GEO Region'] = df_sin_columnas['GEO Summary'].replace({'US': 0, 'Asia': 1,'Europe': 2, 'Canada': 3,'Mexico': 4, 'Australia / Oceania': 5,'Central America': 6, 'Middle East':7, 'South America': 8})
+    def analyze_terminal(self):
+        print('------Terminal------')
+        print(self.df['Terminal'].unique().compute())
+        print(self.df['Terminal'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['Terminal'].unique())}
+        self.df['Terminal'] = self.df['Terminal'].map(word_to_number)
 
+    def analyze_boarding_area(self):
+        print('------Boarding Area------')
+        print(self.df['Boarding Area'].unique().compute())
+        print(self.df['Boarding Area'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['Boarding Area'].unique())}
+        self.df['Boarding Area'] = self.df['Boarding Area'].map(word_to_number)
 
+    def analyze_month(self):
+        print('------Month------')
+        print(self.df['Month'].unique().compute())
+        print(self.df['Month'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['Month'].unique())}
+        self.df['Month'] = self.df['Month'].map(word_to_number)
 
+    def analyze_operating_airline(self):
+        print('------Operating Airline------')
+        print(self.df['Operating Airline'].unique().compute())
+        print(self.df['Operating Airline'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['Operating Airline'].unique())}
+        self.df['Operating Airline'] = self.df['Operating Airline'].map(word_to_number)
 
-# Activity Type Code
-print('------Activity Type Code------')
-# dime los valores unicos de la columna Activity Type Code
-print(df_sin_columnas['Activity Type Code'].unique().compute())
-# dime cuantas veces aparece cada valor
-print(df_sin_columnas['Activity Type Code'].value_counts().compute())
-df_sin_columnas['Activity Type Code'] = df_sin_columnas['Activity Type Code'].replace({'Deplaned': 0, 'Enplaned': 1, 'Thru / Transit': 2})
-
-#Price Category Code
-print('------Price Category Code------')
-print(df_sin_columnas['Price Category Code'].unique().compute())
-print(df_sin_columnas['Price Category Code'].value_counts().compute())
-df_sin_columnas['Price Category Code'] = df_sin_columnas['Price Category Code'].replace({'Low Fare': 0, 'Other': 1})
-
-
-#Terminal
-print('------Terminal------')
-print(df_sin_columnas['Terminal'].unique().compute())
-# sime cuantas veces aparece cada valor
-print(df_sin_columnas['Terminal'].value_counts().compute())
-# borra los que sean other
-df_sin_columnas = df_sin_columnas[df_sin_columnas['Terminal'] != 'Other']
-df_sin_columnas['Terminal'] = df_sin_columnas['Terminal'].replace({'Terminal 1': 0, 'Terminal 2': 1,'Terminal 3': 2, 'International': 3})
-
-
-#Boarding Area
-print('------Boarding Area------')
-print(df_sin_columnas['Boarding Area'].unique().compute())
-print(df_sin_columnas['Boarding Area'].value_counts().compute())
-df_sin_columnas['Boarding Area'] = df_sin_columnas['Boarding Area'].replace({'B': 0, 'C': 1,'A': 2, 'D': 3, 'E': 4, 'G': 5, 'F': 6})
-
-
-# Month
-print('------Month------')
-print(df_sin_columnas['Month'].unique().compute())
-print(df_sin_columnas['Month'].value_counts().compute())
-# cambia los meses por numeros
-df_sin_columnas['Month'] = df_sin_columnas['Month'].replace({'January': 1, 'February': 2,'March': 3, 'April': 4, 'May': 5, 'June': 6, 'July': 7,'August': 8, 'September': 9, 'October': 10, 'November': 11, 'December': 12})
-# Operating Airline IATA Code
-
-
-# Operating Airline
-print('------Operating Airline------')
-# dime los valores unicos de la columna Operating Airline y cuantas veces aparece cada uno
-print(df_sin_columnas['Operating Airline'].unique().compute())
-print(df_sin_columnas['Operating Airline'].value_counts().compute())
-
-
-
-
-
-# Mapea cada palabra única a un número único
-word_to_number = {word: number for number, word in enumerate(df_sin_columnas['Operating Airline'].unique())}
-
-# Reemplaza los valores de la columna con los números correspondientes
-df_sin_columnas['Operating Airline'] = df_sin_columnas['Operating Airline'].map(word_to_number)
-
-# Operating Airline
-print('------Operating Airline IATA Code------')
-# dime los valores unicos de la columna Operating Airline y cuantas veces aparece cada uno
-print(df_sin_columnas['Operating Airline IATA Code'].unique().compute())
-print(df_sin_columnas['Operating Airline IATA Code'].value_counts().compute())
-
-
-
-
-
-# Mapea cada palabra única a un número único
-word_to_number = {word: number for number, word in enumerate(df_sin_columnas['Operating Airline IATA Code'].unique())}
-
-# Reemplaza los valores de la columna con los números correspondientes
-df_sin_columnas['Operating Airline IATA Code'] = df_sin_columnas['Operating Airline IATA Code'].map(word_to_number)
-
-# borramos la columna Operating Airline IATA Code ya que aporta lo mismo que la columna Operating Airline
-df_sin_columnas = df_sin_columnas.drop(columns=['Operating Airline IATA Code'])
-
-
-
-
-
-# cambia las columnas object por numeros para poder trabajar con ellas
-
-
-df_sin_columnas['Operating Airline'] = df_sin_columnas['Operating Airline'].astype(float)
-df_sin_columnas['GEO Summary'] = df_sin_columnas['GEO Summary'].astype(int)
-df_sin_columnas['GEO Region'] = df_sin_columnas['GEO Region'].astype(int)
-df_sin_columnas['Activity Type Code'] = df_sin_columnas['Activity Type Code'].astype(int)
-df_sin_columnas['Price Category Code'] = df_sin_columnas['Price Category Code'].astype(int)
-df_sin_columnas['Terminal'] = df_sin_columnas['Terminal'].astype(int)
-df_sin_columnas['Boarding Area'] = df_sin_columnas['Boarding Area'].astype(int)
-df_sin_columnas['Month'] = df_sin_columnas['Month'].astype(int)
-
-
-
-# dime los tipos de datos de cada columna
-print(df_sin_columnas.dtypes)
-
-
-
-
-# borra la columna year ya que no da la misma información que activity period
-df_sin_columnas = df_sin_columnas.drop('Year', axis=1)
-# borra la columna Geo Summary ya que no da la misma información que Geo Region pero Geo Region tiene mas informacion
-df_sin_columnas = df_sin_columnas.drop('GEO Summary', axis=1)
-
-print(f"Número de columnas: {len(df_sin_columnas.columns)}")
-
-# guardalo en un csv
-df_sin_columnas.to_csv('C:/Trabajo-dask/dask/csvs/air_traffic_limpiado.csv', index=False)
+    def analyze_operating_airline_iata_code(self):
+        print('------Operating Airline IATA Code------')
+        print(self.df['Operating Airline IATA Code'].unique().compute())
+        print(self.df['Operating Airline IATA Code'].value_counts().compute())
+        word_to_number = {word: number for number, word in enumerate(self.df['Operating Airline IATA Code'].unique())}
+        self.df['Operating Airline IATA Code'] = self.df['Operating Airline IATA Code'].map(word_to_number)
+        self.df = self.df.drop(columns=['Operating Airline IATA Code'])
+        
     
-correlacion = df_sin_columnas.corr()
-sns.heatmap(correlacion, xticklabels=correlacion.columns, yticklabels=correlacion.columns, annot=True)
+    def guardar_csv(self):
+        self.df.to_csv('C:/Trabajo-dask/dask/csvs/air_traffic_limpiado.csv', index=False)
+    
+    def borrar_activity_period(self):
+        self.df = self.df.drop(columns=['Activity Period'])
+        
+    def resumen(self):    
+        print(self.df.dtypes)
+        num_columnas = len(self.df.columns)
+        print(f"Número de columnas: {num_columnas}")
+        
+    def matriz_correlacion(self):
+        correlacion = self.df.corr()
+        sns.heatmap(correlacion, xticklabels=correlacion.columns, yticklabels=correlacion.columns, annot=True)
+        plt.savefig('C:/Trabajo-dask/dask/graficos/matrizcorrelacion.png')
+        
+    
+   
+    
 
-# guardame la matriz de correlacion en una imagen
-plt.savefig('C:/Trabajo-dask/dask/graficos/matrizcorrelacion.png')
 
-
+# Función principal (main)
+def main():
+    path = 'C:/Trabajo-dask/dask/csvs/air_traffic_data (1).csv'
+    data_analyzer = DataAnalysis(path)
+    data_analyzer.load_data()
+    data_analyzer.print_data_types()
+    data_analyzer.count_unique_companies()
+    data_analyzer.average_passengers_per_company()
+    data_analyzer.remove_duplicates()
+    data_analyzer.remove_columns()
+    
+    data_analyzer.analyze_geo_summary()
+    data_analyzer.analyze_geo_region()
+    data_analyzer.analyze_activity_type_code()
+    data_analyzer.analyze_price_category_code()
+    data_analyzer.analyze_terminal()
+    data_analyzer.analyze_boarding_area()
+    data_analyzer.analyze_month()
+    data_analyzer.analyze_operating_airline()
+    data_analyzer.analyze_operating_airline_iata_code()
+    data_analyzer.borrar_activity_period()
+    data_analyzer.resumen()
+    data_analyzer.guardar_csv()
+    data_analyzer.matriz_correlacion()
+   
+    
+main()
