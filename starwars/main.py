@@ -1,0 +1,3 @@
+from lanzador import *
+
+menu()
