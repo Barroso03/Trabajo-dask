@@ -3,7 +3,7 @@ from clases.Comprador import *
 from clases.Vendedor import *
 from clases.Holocron import *
 from clases.Servidor import *
-import threading
+
 
 def menu():
     while True:
@@ -60,12 +60,12 @@ def ejecutar_ejercicio_2():
     # Crear hilos para publicar anuncios y realizar compras
     hilo_publicar = Thread(target=publicar_anuncios, args=(servidor, vendedores))
     hilo_comprar = Thread(target=realizar_compras, args=(servidor, compradores))
-    stop_event = threading.Event()
+    
     # Iniciar los hilos
-    input("Presiona enter cuando quieras parar")
+    
     hilo_publicar.start()
     hilo_comprar.start()
-    stop_event.set()
+    
     # Esperar a que los hilos terminen (esto no sucederá en este caso ya que son bucles infinitos)
     hilo_publicar.join()
     hilo_comprar.join()
